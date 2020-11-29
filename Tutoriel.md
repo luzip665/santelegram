@@ -1,10 +1,12 @@
 # SanTelegram Bot
 
+> Si vous avez été redirigé ici par mon blog, vous pouvez aller à directement à la partie : [Préparer le code](https://github.com/RduMarais/santelegram/blob/master/Tutoriel.md#pr%C3%A9parer-le-code)
+
 Cet hiver 2020, il est plus important que jamais de garder le contact avec ceux qui nous sont proches. Contact à distance évidemment, vu que l'hiver est marqué par : 1) le froid (logique) et 2) une pandémie mortelle. Pas facile donc de se préparer avec ses proches et sa famille à fêter Noël sereinement. Et pour éviter de réduire Noël à un simple envoi de cadeaux achetés en ligne à des entreprises payant plus ou moins leurs impôts, en discutant avec un ami (bien que collègue), on a eu cette idée de faire un **Bot Telegram "calendrier de l'Avent"**. 
 
 > Ce post de blog a pour but de vous aider à faire votre en bot rapidement. Je m'adresse à des gens qui ont peu ou pas codé du tout. 
 >
-> Si ce n'est pas votre cas, ou si vous êtes pressés, vous pouvez copier-coller les fichiers qui sont à la fin du post ou [sur mon GitHub](https://github.com/RduMarais/santelegram) et rentrer dans les 10 minutes promises par le titre.
+> Si ce n'est pas votre cas, ou si vous êtes pressés, vous pouvez copier-coller les fichiers qui sont à la fin du post ou [dans le dossier](https://github.com/RduMarais/santelegram) et rentrer dans les 10 minutes promises par le titre.
 
 ##### Telegram, c'est quoi ? 
 
