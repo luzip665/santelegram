@@ -1,0 +1,11 @@
+# Compiled python modules
+*.pyc
+Blog.html
+config.ini
+content.md
+santabot.log
+santapoolbot.session
+usernames.ini
+usernames.json
+notes.md
+telethon_get_users_perso.py
