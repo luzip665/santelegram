@@ -4,7 +4,7 @@ Cet hiver 2020, il est plus important que jamais de garder le contact avec ceux 
 
 > Ce post de blog a pour but de vous aider à faire votre en bot rapidement. Je m'adresse à des gens qui ont peu ou pas codé du tout. 
 >
-> Si ce n'est pas votre cas, ou si vous êtes pressés, vous pouvez copier-coller les fichiers qui sont à la fin du post ou [sur mon GitHub]() et rentrer dans les 10 minutes promises par le titre.
+> Si ce n'est pas votre cas, ou si vous êtes pressés, vous pouvez copier-coller les fichiers qui sont à la fin du post ou [sur mon GitHub](https://github.com/RduMarais/santelegram) et rentrer dans les 10 minutes promises par le titre.
 
 ##### Telegram, c'est quoi ? 
 
@@ -71,11 +71,11 @@ Pour créer le bot, d'innombrables tutoriels existent. J'ai utilisé [celui-là]
 
 Le programme que je vous propose pour interagir avec notre bot est écrit en Python. C'est un langage qui se comprend assez facilement, qui est courant et qui n'a pas besoin de compiler. Tout ça fait qu'il est très pratique pour des petits scripts comme notre bot.
 
-Si vous ne l'avez pas déjà, il faut donc [installer Python](). Faites attention en installant : les versions Python2 et Python3 ne sont pas compatibles entre elles ! Ici, nous allons utiliser Python3 et pas Python2, parce qu'on est bientôt en 2021 et qu'on est pas des barbares quand même.
+Si vous ne l'avez pas déjà, il faut donc [installer Python](https://www.python.org/downloads/). Faites attention en installant : les versions Python2 et Python3 ne sont pas compatibles entre elles ! Ici, nous allons utiliser Python3 et pas Python2, parce qu'on est bientôt en 2021 et qu'on est pas des barbares quand même.
 
 Pour que le programme soit court et simple à comprendre, il utilise des **bibliothèques**, c'est à dire des bouts de code que beaucoup de gens utilisent, et qu'on a mis en commun pour pas avoir tout à réécrire. Il faut donc installer les bibliothèques susnommées.
 
-Pour gérer facilement ces bibliothèques de code, nous avons besoin de pip, que l'on peut [télécharger ici](). Si vous venez de télécharger Python3, pip est inclus dedans par défaut. Pip est un gestionnaire de bibliothèques, c'est grâce à cet outil que ajouter, mettre à jour ou supprimer des bibliothèques se gère aussi simplement que des applications que l'on télécharge sur l'App Store ou le Play Store.
+Pour gérer facilement ces bibliothèques de code, nous avons besoin de pip, que l'on peut [télécharger ici](https://pip.pypa.io/en/stable/installing/). Si vous venez de télécharger Python3, pip est inclus dedans par défaut. Pip est un gestionnaire de bibliothèques, c'est grâce à cet outil que ajouter, mettre à jour ou supprimer des bibliothèques se gère aussi simplement que des applications que l'on télécharge sur l'App Store ou le Play Store.
 
 Enfin, il faut savoir que si vous utilisez Linux, certains composants sont écrits en Python. Donc modifier les bibliothèques installées peut mettre un peu le bazar si on sait pas faire. Pour éviter cela, nous allons utiliser un **environnement virtuel**. Cela permet de choisir la version exacte de Python, les bibliothèques installées etc. sans modifier directement ce qui est sur votre ordinateur. Pour cela, plusieurs solutions, je vous propose ici d'utiliser `python -m venv` mais vous faites comme vous voulez.
 
@@ -309,7 +309,7 @@ def erreur(update, context):
 
 Maintenant, vous avez peut-être envie de changer certains textes renvoyés par le bot. Pour cela, il suffit de le changer directement dans le code. En règle générale, devoir modifier le code pour pouvoir changer quelque chose d'accessoire, comme du texte, ce n'est pas une bonne idée (on dit que ce texte est _hard codé_). Donc nous allons mettre tout le texte dans un fichier à part, et notre code ira lire ce fichier. De cette manière, si vous décidez de changer la langue du bot, il suffira de modifier le fichier de texte.
 
-Un autre avantage est que la clé API du bot ne se retrouve pas dans le texte du code. Si vous voulez partager ce code, comme je l'ai fait sur [GitHub]() il ne faut pas que vous donniez au monde entier accès à votre bot.
+Un autre avantage est que la clé API du bot ne se retrouve pas dans le texte du code. Si vous voulez partager ce code, comme je l'ai fait sur [GitHub](https://github.com/RduMarais/santelegram) il ne faut pas que vous donniez au monde entier accès à votre bot.
 
 Donc nous allons pour cela créer un fichier **config.ini**, qui devrait ressembler à : 
 

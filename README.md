@@ -11,7 +11,7 @@ git clone https://github.com/RduMarais/santelegram.git
 
 ## usage : 
 
-> I did a *huge* tutorial for beginners (in French) on my personal blog. chek it out!
+> I did a *huge* tutorial for beginners (in French) on my personal blog and here : https://github.com/RduMarais/santelegram/blob/master/Tutoriel.md
 
  * Change the **config_example.ini** file name to **config.ini**
  * Write in it the Advent Calendar you want, with the usernames you want to be able to open.
