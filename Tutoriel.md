@@ -71,11 +71,11 @@ Pour créer le bot, d'innombrables tutoriels existent. J'ai utilisé [celui-là]
 
 Le programme que je vous propose pour interagir avec notre bot est écrit en Python. C'est un langage qui se comprend assez facilement, qui est courant et qui n'a pas besoin de compiler. Tout ça fait qu'il est très pratique pour des petits scripts comme notre bot.
 
-Si vous ne l'avez pas déjà, il faut donc [installer Python](). Faites attention en installant : les versions Python2 et Python3 ne sont pas compatibles entre elles ! Ici, nous allons utiliser Python3 et pas Python2, parce qu'on est bientôt en 2021 et qu'on est pas des barbares quand même.
+Si vous ne l'avez pas déjà, il faut donc [installer Python](https://www.python.org/downloads/). Faites attention en installant : les versions Python2 et Python3 ne sont pas compatibles entre elles ! Ici, nous allons utiliser Python3 et pas Python2, parce qu'on est bientôt en 2021 et qu'on est pas des barbares quand même.
 
 Pour que le programme soit court et simple à comprendre, il utilise des **bibliothèques**, c'est à dire des bouts de code que beaucoup de gens utilisent, et qu'on a mis en commun pour pas avoir tout à réécrire. Il faut donc installer les bibliothèques susnommées.
 
-Pour gérer facilement ces bibliothèques de code, nous avons besoin de pip, que l'on peut [télécharger ici](). Si vous venez de télécharger Python3, pip est inclus dedans par défaut. Pip est un gestionnaire de bibliothèques, c'est grâce à cet outil que ajouter, mettre à jour ou supprimer des bibliothèques se gère aussi simplement que des applications que l'on télécharge sur l'App Store ou le Play Store.
+Pour gérer facilement ces bibliothèques de code, nous avons besoin de pip, que l'on peut [télécharger ici](https://pip.pypa.io/en/stable/installing/). Si vous venez de télécharger Python3, pip est inclus dedans par défaut. Pip est un gestionnaire de bibliothèques, c'est grâce à cet outil que ajouter, mettre à jour ou supprimer des bibliothèques se gère aussi simplement que des applications que l'on télécharge sur l'App Store ou le Play Store.
 
 Enfin, il faut savoir que si vous utilisez Linux, certains composants sont écrits en Python. Donc modifier les bibliothèques installées peut mettre un peu le bazar si on sait pas faire. Pour éviter cela, nous allons utiliser un **environnement virtuel**. Cela permet de choisir la version exacte de Python, les bibliothèques installées etc. sans modifier directement ce qui est sur votre ordinateur. Pour cela, plusieurs solutions, je vous propose ici d'utiliser `python -m venv` mais vous faites comme vous voulez.
 
