@@ -35,8 +35,8 @@ def init_api():
 	config.read(config_file_name)
 	API_KEY = config['API']['TOKEN']
 	CONVERSATIONS =  json.loads(config['API']['conversations'])
-    START_TIME = config['CONFIG']['STARTTIME']
-    STOP_TIME = config['CONFIG']['STOPTIME']
+	START_TIME = int(config['CONFIG']['STARTTIME'])
+	STOP_TIME = int(config['CONFIG']['STOPTIME'])
 	return(API_KEY,CONVERSATIONS, START_TIME, STOP_TIME)
 
 ## SET GLOBAL VARIABLES
@@ -70,7 +70,7 @@ def tip(update, context):
 
 """TODO : m'envoyer un msg quand on fait /tip"""
 def notify(text):
-    logger.error("TODO")
+	logger.error("TODO")
 
 """retourne le jour si on est en décembre (ou au mois MONTH) entre 9 et 11h"""
 def is_time_ok(date):
@@ -84,7 +84,7 @@ def is_time_ok(date):
 
 def open(update,context):
 	"""Sends a tip if and only if the right sender issues /open"""
-	# logger.info(update.message.date.month)
+	# logger.info(update)
 	if(str(update.message.chat.id) in CONVS):
 		chat = CONVS[str(update.message.chat.id)]
 		# logger.info("chat : "+chat)
@@ -93,12 +93,16 @@ def open(update,context):
 		if(day):
 			authorized_users = json.loads(read_config(chat,"users"))[day-1]
 			logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
-			# logger.info(update.message.from_user.username)
+			logger.info(update.message.from_user.username)
 			if(update.message.from_user.id in authorized_users):
 				update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
-				tip = json.loads(read_config(chat,"messages"))[day-1] # -1 vu que l'array, contrairement au mois, commence à zéro
+				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
+				tip = array[day-1]
+				logger.info(tip)
 				for line in tip:
 					update.message.reply_text(line)
+			else:
+				update.message.reply_text("Désolé, ce n'est pas à toi d'ouvrir le calendrier")
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
@@ -109,12 +113,14 @@ def help(update, context):
 
 def erreur(update, context):
 	"""Echo the user message."""
-	update.message.reply_text(read_config("CONFIG",'error'))
+	# update.message.reply_text(read_config("CONFIG",'error'))
+	logger.info("erreur : "+update)
 
 
 def error(update, context):
 	"""Log Errors caused by Updates."""
 	logger.warning('Update "%s" caused error "%s"', update, context.error)
+
 
 def main():
 	"""Start the bot."""

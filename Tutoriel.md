@@ -414,7 +414,7 @@ def is_time_ok(date):
 
 Vous remarquez que cette fonction utilise des variables globales `MONTH`, `START_TIME`, `STOP_TIME` et `DEBUG` qu'on a déjà défini plus haut, dans le fichier de configuration et directement dans le script. `MONTH` et `DEBUG` ont vocation à seulement nous aider durant le développement, d'où leur présence directement dans le script.
 
-> J'attire votre attention que le script utilise l'heure vue par le bot, cad l'heure GMT. Donc il faut mettre `<l'heure voulue> -1` (en hiver) dans le fichier de configuration.
+> J'attire votre attention sur le fait que le script utilise l'heure vue par le bot, cad l'heure GMT. Donc il faut mettre `<l'heure voulue> -1` (en hiver) dans le fichier de configuration.
 
 Ensuite nous allons ajouter les messages dans le fichier de config, dans une section avec le nom du groupe.
 
