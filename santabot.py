@@ -11,7 +11,8 @@ Then, the bot is started and runs until we press Ctrl-C on the command line.
 import configparser
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 try:
 	import json
@@ -21,10 +22,10 @@ except ImportError:
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-					level=logging.INFO,filename="santabot.log")
+					level=logging.INFO)
 
 logger = logging.getLogger(__name__) # i.e le logger va afficher de quel fichier du package
-DEBUG = True # if True, accepte des demandes à des moments random
+DEBUG = False # if True, accepte des demandes à des moments random
 MONTH = 12
 config_file_name = "config.ini" # super original hein
 
@@ -61,16 +62,41 @@ def start(update, context):
 	start_text = read_config("CONFIG","starttext")
 	update.message.reply_text(start_text)
 
-# TODO : proposer des tips
+# Pour proposer des tips
 def tip(update, context):
 	"""Send a random msg when the command /tip is issued."""
-	tips = json.loads(read_config("CONFIG","tips"))
-	for tip in tips:
+	logger.info("tip : "+str(update.message))
+	tip = str(update.message.text)[5:]
+	if(tip):
+		update.message.reply_text("Votre tip est :")
 		update.message.reply_text(tip)
+		notify(tip, update, context)
+	else:
+		update.message.reply_markdown_v2(read_config("CONFIG","tip"))
 
-"""TODO : m'envoyer un msg quand on fait /tip"""
-def notify(text):
-	logger.error("TODO")
+# Pour que les modérateurs approuvent les tips
+def approve(update,context):
+	if(update.message.chat_id == int(read_config("API","PROPRIO"))):
+		print(update.message.caption_markdown_v2)
+		tip = update.message.text[9:]
+		config2=configparser.ConfigParser()
+		config2.read("submissions.ini")
+		array_of_submissions = json.loads(config2["SUBMISSIONS"]["ARRAY"])
+		array_of_submissions.append(tip)
+		config2["SUBMISSIONS"]["ARRAY"] = json.dumps(array_of_submissions)
+		with open("submissions.ini", "w") as submissionsfile:
+			config2.write(submissionsfile)
+		logger.info("user : "+str(update.message.from_user.first_name)+" added tip : "+tip)
+		update.message.reply_text("ajouté")
+
+
+"""Envoie un msg au userid "proprio" quand on fait /tip"""
+def notify(tip, update, context):
+	notification = "Tip de "+str(update.message.from_user.first_name)+" (id:"+str(update.message.from_user.id)+")"
+	notified_id = int(read_config("API","PROPRIO"))
+	context.bot.send_message(chat_id = notified_id,text=notification)
+	message = context.bot.send_message(chat_id = notified_id,text=tip)
+
 
 """retourne le jour si on est en décembre (ou au mois MONTH) entre 9 et 11h"""
 def is_time_ok(date):
@@ -82,7 +108,7 @@ def is_time_ok(date):
 	else:
 		return False
 
-def open(update,context):
+def open_day(update,context):
 	"""Sends a tip if and only if the right sender issues /open"""
 	# logger.info(update)
 	if(str(update.message.chat.id) in CONVS):
@@ -100,9 +126,9 @@ def open(update,context):
 				tip = array[day-1]
 				logger.info(tip)
 				for line in tip:
-					update.message.reply_text(line)
+					update.message.reply_markdown_v2(line)
 			else:
-				update.message.reply_text("Désolé, ce n'est pas à toi d'ouvrir le calendrier")
+				update.message.reply_markdown_v2("_Désolé, ce n'est pas à toi d'ouvrir le calendrier_")
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
@@ -114,7 +140,7 @@ def help(update, context):
 def erreur(update, context):
 	"""Echo the user message."""
 	# update.message.reply_text(read_config("CONFIG",'error'))
-	logger.info("erreur : "+update)
+	logger.info("erreur : "+str(update))
 
 
 def error(update, context):
@@ -135,14 +161,15 @@ def main():
 	# on different commands - answer in Telegram
 	dp.add_handler(CommandHandler("start", start))
 	dp.add_handler(CommandHandler("help", help))
-	#dp.add_handler(CommandHandler("tip", tip))
-	dp.add_handler(CommandHandler("open", open))
+	dp.add_handler(CommandHandler("tip", tip))
+	dp.add_handler(CommandHandler("approve", approve))
+	dp.add_handler(CommandHandler("open", open_day))
 
 	# on noncommand i.e message - echo the message on Telegram
-	dp.add_handler(MessageHandler(Filters.text, erreur))
+	# dp.add_handler(MessageHandler(Filters.text, erreur))
 
 	# log all errors
-	dp.add_error_handler(error)
+	# dp.add_error_handler(error)
 
 	# Start the Bot
 	updater.start_polling()
