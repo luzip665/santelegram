@@ -25,14 +25,14 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 					level=logging.INFO)
 
 logger = logging.getLogger(__name__) # i.e le logger va afficher de quel fichier du package
-DEBUG = False # if True, accepte des demandes à des moments random
+DEBUG = True # if True, accepte des demandes à des moments random
 MONTH = 12
 config_file_name = "config.ini" # super original hein
 
 
 ## READ config file and set Auth variables
 def init_api():
-	config=configparser.ConfigParser()
+	config = configparser.ConfigParser()
 	config.read(config_file_name)
 	API_KEY = config['API']['TOKEN']
 	CONVERSATIONS =  json.loads(config['API']['conversations'])
@@ -45,8 +45,8 @@ def init_api():
 
 ########### FUNCTIONS ######## 
 
-"""Ouvre le fichier de config et lit le tip dans la catégorie qui va bien
-   chat_id doit être un string
+"""Öffnen Sie die Konfigurationsdatei und lesen Sie den Tipp in der Kategorie, das ist in Ordnung
+   chat_id muss eine Zeichenfolge sein
 """
 def read_config(section,key):
 	config=configparser.ConfigParser()
@@ -62,19 +62,18 @@ def start(update, context):
 	start_text = read_config("CONFIG","starttext")
 	update.message.reply_text(start_text)
 
-# Pour proposer des tips
+# Tip abgeben
 def tip(update, context):
 	"""Send a random msg when the command /tip is issued."""
 	logger.info("tip : "+str(update.message))
 	tip = str(update.message.text)[5:]
 	if(tip):
-		update.message.reply_text("Votre tip est :")
-		update.message.reply_text(tip)
+		update.message.reply_text("Dein Tipp ist: " + tip)
 		notify(tip, update, context)
 	else:
 		update.message.reply_markdown_v2(read_config("CONFIG","tip"))
 
-# Pour que les modérateurs approuvent les tips
+# Für den Moderator, um Tipp zu genehmigen
 def approve(update,context):
 	if(update.message.chat_id == int(read_config("API","PROPRIO"))):
 		print(update.message.caption_markdown_v2)
@@ -87,18 +86,20 @@ def approve(update,context):
 		with open("submissions.ini", "w") as submissionsfile:
 			config2.write(submissionsfile)
 		logger.info("user : "+str(update.message.from_user.first_name)+" added tip : "+tip)
-		update.message.reply_text("ajouté")
+		update.message.reply_text("hinzugefügt")
 
 
-"""Envoie un msg au userid "proprio" quand on fait /tip"""
 def notify(tip, update, context):
+	"""Eine Nachricht an den Eigentümer mit /tip <nachricht>
+		PROPRIO ist die Chat-ID vom Eigentümer
+	"""
 	notification = "Tip de "+str(update.message.from_user.first_name)+" (id:"+str(update.message.from_user.id)+")"
 	notified_id = int(read_config("API","PROPRIO"))
 	context.bot.send_message(chat_id = notified_id,text=notification)
 	message = context.bot.send_message(chat_id = notified_id,text=tip)
 
 
-"""retourne le jour si on est en décembre (ou au mois MONTH) entre 9 et 11h"""
+"""gibt den Tag zurück, wenn er im Dezember (oder im Monat MONAT) zwischen 9 und 11 Uhr liegt"""
 def is_time_ok(date):
 	if(date.month == MONTH or DEBUG):
 		if(date.hour >= START_TIME and date.hour <= STOP_TIME or DEBUG):
@@ -117,18 +118,19 @@ def open_day(update,context):
 		day=is_time_ok(update.message.date)
 		# logger.info("day : "+str(day))
 		if(day):
-			authorized_users = json.loads(read_config(chat,"users"))[day-1]
+			#authorized_users = json.loads(read_config(chat,"users"))[day-1]
+			authorized_users = json.loads(read_config(chat, "users"))[1]
 			logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
 			logger.info(update.message.from_user.username)
 			if(update.message.from_user.id in authorized_users):
 				update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
 				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
-				tip = array[day-1]
+				tip = array[3]
 				logger.info(tip)
 				for line in tip:
 					update.message.reply_markdown_v2(line)
 			else:
-				update.message.reply_markdown_v2("_Désolé, ce n'est pas à toi d'ouvrir le calendrier_")
+				update.message.reply_markdown_v2("")
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
