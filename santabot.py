@@ -118,19 +118,18 @@ def open_day(update,context):
 		day=is_time_ok(update.message.date)
 		# logger.info("day : "+str(day))
 		if(day):
-			#authorized_users = json.loads(read_config(chat,"users"))[day-1]
-			authorized_users = json.loads(read_config(chat, "users"))[1]
+			authorized_users = json.loads(read_config(chat,"users"))[day-1]
 			logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
 			logger.info(update.message.from_user.username)
 			if(update.message.from_user.id in authorized_users):
 				update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
 				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
-				tip = array[3]
+				tip = array[day-1]
 				logger.info(tip)
 				for line in tip:
 					update.message.reply_markdown_v2(line)
 			else:
-				update.message.reply_markdown_v2("")
+				update.message.reply_markdown_v2("Das ist nicht Dein Tag")
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
