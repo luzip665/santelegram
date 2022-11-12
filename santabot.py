@@ -12,7 +12,7 @@ import configparser
 import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 
 try:
 	import json
@@ -60,7 +60,9 @@ def read_config(section,key):
 def start(update, context):
 	"""Send a message when the command /start is issued."""
 	start_text = read_config("CONFIG","starttext")
-	update.message.reply_text(start_text)
+	# update.message.reply_text(start_text)
+	send_message(update, start_text)
+
 
 # Tip abgeben
 def tip(update, context):
@@ -68,10 +70,12 @@ def tip(update, context):
 	logger.info("tip : "+str(update.message))
 	tip = str(update.message.text)[5:]
 	if(tip):
-		update.message.reply_text("Dein Tipp ist: " + tip)
+		# update.message.reply_text("Dein Tipp ist: " + tip)
+		send_message(update, "Dein Tipp ist: " + tip)
 		notify(tip, update, context)
 	else:
-		update.message.reply_markdown_v2(read_config("CONFIG","tip"))
+		# update.message.reply_markdown_v2(read_config("CONFIG","tip"))
+		send_message(update, read_config("CONFIG","tip"))
 
 # Für den Moderator, um Tipp zu genehmigen
 def approve(update,context):
@@ -86,7 +90,8 @@ def approve(update,context):
 		with open("submissions.ini", "w") as submissionsfile:
 			config2.write(submissionsfile)
 		logger.info("user : "+str(update.message.from_user.first_name)+" added tip : "+tip)
-		update.message.reply_text("hinzugefügt")
+		# update.message.reply_text("hinzugefügt")
+		send_message(update, "hinzugefügt")
 
 
 def notify(tip, update, context):
@@ -94,9 +99,9 @@ def notify(tip, update, context):
 		PROPRIO ist die Chat-ID vom Eigentümer
 	"""
 	notification = "Tip de "+str(update.message.from_user.first_name)+" (id:"+str(update.message.from_user.id)+")"
-	notified_id = int(read_config("API","PROPRIO"))
-	context.bot.send_message(chat_id = notified_id,text=notification)
-	message = context.bot.send_message(chat_id = notified_id,text=tip)
+	notified_id = int(read_config("API", "PROPRIO"))
+	context.bot.send_message(chat_id=notified_id, text=notification)
+	message = context.bot.send_message(chat_id=notified_id, text=tip)
 
 
 """gibt den Tag zurück, wenn er im Dezember (oder im Monat MONAT) zwischen 9 und 11 Uhr liegt"""
@@ -122,26 +127,42 @@ def open_day(update,context):
 			logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
 			logger.info(update.message.from_user.username)
 			if(update.message.from_user.id in authorized_users):
-				update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
+				# update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
+				send_message(update, read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
 				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
 				tip = array[day-1]
 				logger.info(tip)
 				for line in tip:
-					update.message.reply_markdown_v2(line)
+					# update.message.reply_markdown_v2(line)
+					send_message(update, line)
 			else:
-				update.message.reply_markdown_v2("Das ist nicht Dein Tag")
+				# update.message.reply_markdown_v2("Das ist nicht Dein Tag")
+				send_message(update, "Das ist nicht Dein Tag")
+
+
+def send_message(update, msg: str):
+	if msg.startswith('IMAGE:'):
+		file = msg[6:]
+		photo = open(file, 'rb')
+		update.message.reply_photo(photo)
+	elif msg.startswith('MARKDOWN:'):
+		update.message.reply_markdown_v2(msg[9:])
+	else:
+		update.message.reply_text(msg)
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
-	helplines = json.loads(read_config("CONFIG","help"))
+	helplines = json.loads(read_config("CONFIG", "help"))
 	for line in helplines:
-		update.message.reply_text(line)
+		# update.message.reply_text(line)
+		send_message(update, line)
 
 
 def erreur(update, context):
 	"""Echo the user message."""
+	send_message(update, read_config("CONFIG",'error'))
 	# update.message.reply_text(read_config("CONFIG",'error'))
-	logger.info("erreur : "+str(update))
+	# logger.info("erreur : "+str(update))
 
 
 def error(update, context):
@@ -167,13 +188,17 @@ def main():
 	dp.add_handler(CommandHandler("open", open_day))
 
 	# on noncommand i.e message - echo the message on Telegram
-	# dp.add_handler(MessageHandler(Filters.text, erreur))
+	dp.add_handler(MessageHandler(Filters.text, erreur))
 
 	# log all errors
 	# dp.add_error_handler(error)
 
 	# Start the Bot
 	updater.start_polling()
+
+
+	# bot = Bot(API_KEY)
+	# print(bot.send_message("CHAT-ID", 'Message'))
 
 	# Run the bot until you press Ctrl-C or the process receives SIGINT,
 	# SIGTERM or SIGABRT. This should be used most of the time, since
