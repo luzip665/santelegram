@@ -59,9 +59,9 @@ def read_config(section,key):
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
 	"""Send a message when the command /start is issued."""
-	start_text = read_config("CONFIG","starttext")
-	# update.message.reply_text(start_text)
-	send_message(update, start_text)
+	lines = json.loads(read_config("CONFIG", "starttext"))
+	for line in lines:
+		send_message(update, line)
 
 
 # Tip abgeben
