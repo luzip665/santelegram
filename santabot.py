@@ -59,9 +59,7 @@ def read_config(section,key):
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
 	"""Send a message when the command /start is issued."""
-	lines = json.loads(read_config("CONFIG", "starttext"))
-	for line in lines:
-		send_message(update, line)
+	send_message(update, read_config("CONFIG", "starttext"))
 
 
 # Tip abgeben
@@ -132,35 +130,34 @@ def open_day(update,context):
 				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
 				tip = array[day-1]
 				logger.info(tip)
-				for line in tip:
-					# update.message.reply_markdown_v2(line)
-					send_message(update, line)
+				send_message(update, tip)
 			else:
 				# update.message.reply_markdown_v2("Das ist nicht Dein Tag")
 				send_message(update, "Das ist nicht Dein Tag")
 
 
 def send_message(update, msg: str):
-	if msg.startswith('IMAGE:'):
-		file = msg[6:]
-		photo = open(file, 'rb')
-		update.message.reply_photo(photo)
-	elif msg.startswith('MARKDOWN:'):
-		update.message.reply_markdown_v2(msg[9:])
+	if msg.strip().startswith('['):
+		lines = json.loads(msg)
 	else:
-		update.message.reply_text(msg)
+		lines = [msg]
+	for line in lines:
+		if msg.startswith('IMAGE:'):
+			file = line[6:]
+			photo = open(file, 'rb')
+			update.message.reply_photo(photo)
+		elif msg.startswith('MARKDOWN:'):
+			update.message.reply_markdown_v2(line[9:])
+		else:
+			update.message.reply_text(line)
 
 def help(update, context):
 	"""Send a message when the command /help is issued."""
-	helplines = json.loads(read_config("CONFIG", "help"))
-	for line in helplines:
-		# update.message.reply_text(line)
-		send_message(update, line)
-
+	send_message(update, read_config("CONFIG", "help"))
 
 def erreur(update, context):
 	"""Echo the user message."""
-	send_message(update, read_config("CONFIG",'error'))
+	send_message(update, read_config("CONFIG", 'error'))
 	# update.message.reply_text(read_config("CONFIG",'error'))
 	# logger.info("erreur : "+str(update))
 
