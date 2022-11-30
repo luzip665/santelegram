@@ -137,16 +137,19 @@ def open_day(update,context):
 
 
 def send_message(update, msg: str):
-	if msg.strip().startswith('['):
-		lines = json.loads(msg)
+	if not isinstance(msg, list):
+		if msg.strip().startswith('['):
+			lines = json.loads(msg)
+		else:
+			lines = [msg]
 	else:
-		lines = [msg]
+		lines = msg
 	for line in lines:
-		if msg.startswith('IMAGE:'):
+		if line.startswith('IMAGE:'):
 			file = line[6:]
 			photo = open(file, 'rb')
 			update.message.reply_photo(photo)
-		elif msg.startswith('MARKDOWN:'):
+		elif line.startswith('MARKDOWN:'):
 			update.message.reply_markdown_v2(line[9:])
 		else:
 			update.message.reply_text(line)
