@@ -11,8 +11,8 @@ Then, the bot is started and runs until we press Ctrl-C on the command line.
 import configparser
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
+from telegram.ext import Application, Updater, CommandHandler, MessageHandler, filters, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot, Update
 
 try:
 	import json
@@ -57,26 +57,26 @@ def read_config(section,key):
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+async def start(update, context):
 	"""Send a message when the command /start is issued."""
-	send_message(update, read_config("CONFIG", "starttext"))
+	await send_message(update, read_config("CONFIG", "starttext"))
 
 
 # Tip abgeben
-def tip(update, context):
+async def tip(update, context):
 	"""Send a random msg when the command /tip is issued."""
 	logger.info("tip : "+str(update.message))
 	tip = str(update.message.text)[5:]
 	if(tip):
 		# update.message.reply_text("Dein Tipp ist: " + tip)
-		send_message(update, "Dein Tipp ist: " + tip)
-		notify(tip, update, context)
+		await send_message(update, "Dein Tipp ist: " + tip)
+		await notify(tip, update, context)
 	else:
 		# update.message.reply_markdown_v2(read_config("CONFIG","tip"))
-		send_message(update, read_config("CONFIG","tip"))
+		await send_message(update, read_config("CONFIG","tip"))
 
 # Für den Moderator, um Tipp zu genehmigen
-def approve(update,context):
+async def approve(update,context):
 	if(update.message.chat_id == int(read_config("API","PROPRIO"))):
 		print(update.message.caption_markdown_v2)
 		tip = update.message.text[9:]
@@ -89,10 +89,10 @@ def approve(update,context):
 			config2.write(submissionsfile)
 		logger.info("user : "+str(update.message.from_user.first_name)+" added tip : "+tip)
 		# update.message.reply_text("hinzugefügt")
-		send_message(update, "hinzugefügt")
+		await send_message(update, "hinzugefügt")
 
 
-def notify(tip, update, context):
+async def notify(tip, update, context):
 	"""Eine Nachricht an den Eigentümer mit /tip <nachricht>
 		PROPRIO ist die Chat-ID vom Eigentümer
 	"""
@@ -112,7 +112,7 @@ def is_time_ok(date):
 	else:
 		return False
 
-def open_day(update,context):
+async def open_day(update,context):
 	"""Sends a tip if and only if the right sender issues /open"""
 	# logger.info(update)
 	if(str(update.message.chat.id) in CONVS):
@@ -126,17 +126,17 @@ def open_day(update,context):
 			logger.info(update.message.from_user.username)
 			if(update.message.from_user.id in authorized_users):
 				# update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
-				send_message(update, read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
+				await send_message(update, read_config("CONFIG","opentext"))
 				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
 				tip = array[day-1]
 				logger.info(tip)
-				send_message(update, tip)
+				await send_message(update, tip)
 			else:
 				# update.message.reply_markdown_v2("Das ist nicht Dein Tag")
-				send_message(update, "Das ist nicht Dein Tag")
+				await send_message(update, "Das ist nicht Dein Tag")
 
 
-def send_message(update, msg: str):
+async def send_message(update, msg: str):
 	if not isinstance(msg, list):
 		if msg.strip().startswith('['):
 			lines = json.loads(msg)
@@ -148,19 +148,19 @@ def send_message(update, msg: str):
 		if line.startswith('IMAGE:'):
 			file = line[6:]
 			photo = open(file, 'rb')
-			update.message.reply_photo(photo)
+			await update.message.reply_photo(photo)
 		elif line.startswith('MARKDOWN:'):
-			update.message.reply_markdown_v2(line[9:])
+			await update.message.reply_markdown_v2(line[9:])
 		else:
-			update.message.reply_text(line)
+			await update.effective_message.reply_text(line)
 
-def help(update, context):
+async def help(update, context):
 	"""Send a message when the command /help is issued."""
-	send_message(update, read_config("CONFIG", "help"))
+	await send_message(update, read_config("CONFIG", "help"))
 
-def erreur(update, context):
+async def erreur(update, context):
 	"""Echo the user message."""
-	send_message(update, read_config("CONFIG", 'error'))
+	await send_message(update, read_config("CONFIG", 'error'))
 	# update.message.reply_text(read_config("CONFIG",'error'))
 	# logger.info("erreur : "+str(update))
 
@@ -175,27 +175,32 @@ def main():
 	# Create the Updater and pass it your bot's token.
 	# Make sure to set use_context=True to use the new context based callbacks
 	# Post version 12 this will no longer be necessary
-	updater = Updater(API_KEY, use_context=True)
+
+	application = Application.builder().token(API_KEY).build()
+
+	application.add_handler(CommandHandler("start", start))
+
+	# updater = Updater(API_KEY)
 
 	# Get the dispatcher to register handlers
-	dp = updater.dispatcher
+	# dp = updater.dispatcher
 
 	# on different commands - answer in Telegram
-	dp.add_handler(CommandHandler("start", start))
-	dp.add_handler(CommandHandler("help", help))
-	dp.add_handler(CommandHandler("tip", tip))
-	dp.add_handler(CommandHandler("approve", approve))
-	dp.add_handler(CommandHandler("open", open_day))
+	application.add_handler(CommandHandler("start", start))
+	application.add_handler(CommandHandler("help", help))
+	application.add_handler(CommandHandler("tip", tip))
+	application.add_handler(CommandHandler("approve", approve))
+	application.add_handler(CommandHandler("open", open_day))
 
 	# on noncommand i.e message - echo the message on Telegram
-	dp.add_handler(MessageHandler(Filters.text, erreur))
+	application.add_handler(MessageHandler(filters.TEXT, erreur))
 
 	# log all errors
 	# dp.add_error_handler(error)
 
 	# Start the Bot
-	updater.start_polling()
-
+	# updater.start_polling()
+	application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 	# bot = Bot(API_KEY)
 	# print(bot.send_message("CHAT-ID", 'Message'))
@@ -203,7 +208,7 @@ def main():
 	# Run the bot until you press Ctrl-C or the process receives SIGINT,
 	# SIGTERM or SIGABRT. This should be used most of the time, since
 	# start_polling() is non-blocking and will stop the bot gracefully.
-	updater.idle()
+	# updater.idle()
 
 
 if __name__ == '__main__':
