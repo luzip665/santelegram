@@ -115,25 +115,20 @@ def is_time_ok(date):
 async def open_day(update,context):
 	"""Sends a tip if and only if the right sender issues /open"""
 	# logger.info(update)
-	if(str(update.message.chat.id) in CONVS):
-		chat = CONVS[str(update.message.chat.id)]
-		# logger.info("chat : "+chat)
-		day=is_time_ok(update.message.date)
-		# logger.info("day : "+str(day))
-		if(day):
-			authorized_users = json.loads(read_config(chat,"users"))[day-1]
-			logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
-			logger.info(update.message.from_user.username)
-			if(update.message.from_user.id in authorized_users):
-				# update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
-				await send_message(update, read_config("CONFIG","opentext"))
-				array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
-				tip = array[day-1]
-				logger.info(tip)
-				await send_message(update, tip)
-			else:
-				# update.message.reply_markdown_v2("Das ist nicht Dein Tag")
-				await send_message(update, "Das ist nicht Dein Tag")
+	chat = "MACONV"
+	# logger.info("chat : "+chat)
+	day=is_time_ok(update.message.date)
+	# logger.info("day : "+str(day))
+	authorized_users = json.loads(read_config(chat,"users"))
+	if(day and (update.message.from_user.id in authorized_users)):
+		logger.info("users : "+str(authorized_users)+" , open request from : "+str(update.message.from_user.id)+":"+update.message.from_user.first_name)
+		logger.info(update.message.from_user.username)
+		# update.message.reply_text(read_config("CONFIG","opentext")+" "+str(update.message.from_user.first_name))
+		await send_message(update, read_config("CONFIG","opentext"))
+		array = json.loads(read_config(chat,"messages")) # -1 vu que l'array, contrairement au mois, commence à zéro
+		tip = array[day-1]
+		logger.info(tip)
+		await send_message(update, tip)
 
 
 async def send_message(update, msg: str):
