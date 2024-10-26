@@ -10,6 +10,7 @@ Then, the bot is started and runs until we press Ctrl-C on the command line.
 """
 import configparser
 import logging
+import time
 
 from telegram.ext import Application, Updater, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot, Update
@@ -131,6 +132,14 @@ async def open_day(update,context):
 		await send_message(update, tip)
 
 
+async def test_auto_send(context):
+	chat_id = json.loads(read_config('MACONV', "users"))[0]
+	logger.info("send auto message")
+	# logger.info(str(update.message.from_user.id) + ' ' + str(update.message.chat_id))
+	await context.bot.send_message(chat_id=chat_id, text="abcd")
+
+
+
 async def send_message(update, msg: str):
 	if not isinstance(msg, list):
 		if msg.strip().startswith('['):
@@ -186,9 +195,12 @@ def main():
 	application.add_handler(CommandHandler("tip", tip))
 	application.add_handler(CommandHandler("approve", approve))
 	application.add_handler(CommandHandler("open", open_day))
+	application.add_handler(CommandHandler("test", test_auto_send))
 
 	# on noncommand i.e message - echo the message on Telegram
 	application.add_handler(MessageHandler(filters.TEXT, erreur))
+
+	application.job_queue.run_once(test_auto_send, 10)
 
 	# log all errors
 	# dp.add_error_handler(error)
